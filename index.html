@@ -472,7 +472,11 @@
   <section id="home">
     <h1>skidware</h1>
     <p>blah blah blah, flavor text, use our shit or not, i dont really care.</p>
-    <button class="btn-key" onclick="alert('key system coming soon')">obtain key</button>
+    <div style="display: flex; gap: 28px; align-items: center;">
+      <button class="btn-key" onclick="navigator.clipboard.writeText(document.getElementById('script-snippet').textContent); alert('script copied to clipboard')">copy script</button>
+      <button class="btn-key" onclick="window.location.href='https://jnkie.com/flow/19c012d6-5259-4939-baec-90c378c5e01f'">obtain key</button>
+    </div>
+    <span id="script-snippet" style="display:none;">loadstring(game:HttpGet("PASTE_YOUR_LOADER_URL_HERE"))()</span>
   </section>
 
   <!-- ───────────────────────────── PAGE 2: GAMES ─── -->
@@ -585,7 +589,7 @@
             how do i get a key
             <span class="faq-arrow">▶</span>
           </button>
-          <div class="faq-answer">script keys can last as short as 32 hours, up to 92 hours.</div>
+          <div class="faq-answer">scroll back up and click [obtain key] on the home page. it's literally right there.</div>
         </div>
 
         <div class="faq-item">
@@ -593,7 +597,7 @@
             how long are the keys?
             <span class="faq-arrow">▶</span>
           </button>
-          <div class="faq-answer">scroll back up and click [obtain key] on the home page. it's literally right there.</div>
+          <div class="faq-answer">script keys can last as short as 32 hours, up to 92 hours.</div>
         </div>
 
         <div class="faq-item">
@@ -617,7 +621,7 @@
             how do i join the community of skids?
             <span class="faq-arrow">▶</span>
           </button>
-          <div class="faq-answer">we, (and me) can be found in the skidware server discord.gg/4m2kUKJ7aE, here i post updates and the script status</div>
+          <div class="faq-answer">we, (and me) can be found in the <a href="https://discord.gg/4m2kUKJ7aE" target="_blank" style="color: var(--fg); font-weight: 600; text-decoration: underline;">skidware server</a>, here i post updates and the script status
         </div>
 
       </div>
