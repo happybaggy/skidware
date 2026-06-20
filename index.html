@@ -237,6 +237,61 @@
       margin-top: 24px;
     }
 
+      .game-selector {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 8px;
+      user-select: none;
+    }
+
+    .gs-arrow {
+      font-family: var(--font);
+      font-size: 1.3rem;
+      font-weight: 700;
+      background: none;
+      border: none;
+      color: var(--fg);
+      cursor: pointer;
+      padding: 4px 6px;
+      line-height: 1;
+      transition: opacity 0.15s, transform 0.15s;
+    }
+    .gs-arrow:hover { opacity: 0.45; }
+    .gs-arrow:active { transform: scale(0.85); }
+
+    .gs-bracket-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .gs-brace {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--fg);
+      line-height: 1;
+    }
+
+    .gs-viewport {
+      position: relative;
+      height: 1.55rem;
+      overflow: hidden;
+      transition: width 0.35s cubic-bezier(.4,0,.2,1);
+      white-space: nowrap;
+    }
+
+    .gs-name {
+      position: absolute;
+      top: 0;
+      left: 0;
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--fg);
+      white-space: nowrap;
+      transition: transform 0.32s cubic-bezier(.4,0,.2,1), opacity 0.32s;
+    }
     .showcase-tab {
       font-size: 1.1rem;
       font-weight: 600;
@@ -531,6 +586,18 @@
 
   <!-- ────────────────────────────── PAGE 3: SHOWCASE ─── -->
   <section id="showcase">
+    <div class="game-selector" id="gameSelector">
+  <button class="gs-arrow" id="gsPrev" aria-label="previous game">&lt;</button>
+  <div class="gs-bracket-wrap">
+    <span class="gs-brace">{</span>
+    <div class="gs-viewport" id="gsViewport">
+      <span class="gs-name" id="gsName">criminality</span>
+    </div>
+    <span class="gs-brace">}</span>
+  </div>
+  <button class="gs-arrow" id="gsNext" aria-label="next game">&gt;</button>
+</div>
+
     <div class="showcase-tabs">
       <button class="showcase-tab active" data-panel="aimbot">aimbot</button>
       <button class="showcase-tab"        data-panel="visuals">visuals</button>
@@ -653,6 +720,74 @@
         if (!wasOpen) item.classList.add('open');
       });
     });
+    // ── Game selector ──
+    (function() {
+      const games = ['criminality', 'lone survival', 'town'];
+      let currentIndex = 0;
+      let animating = false;
+
+      const viewport = document.getElementById('gsViewport');
+      let nameEl = document.getElementById('gsName');
+      const prevBtn = document.getElementById('gsPrev');
+      const nextBtn = document.getElementById('gsNext');
+
+      const measurer = document.createElement('span');
+      measurer.className = 'gs-name';
+      measurer.style.position = 'absolute';
+      measurer.style.visibility = 'hidden';
+      measurer.style.left = '-9999px';
+      document.body.appendChild(measurer);
+
+      function measureWidth(text) {
+        measurer.textContent = text;
+        return measurer.getBoundingClientRect().width;
+      }
+
+      function setGame(newIndex, direction) {
+        if (animating) return;
+        animating = true;
+
+        const newText = games[newIndex];
+        const newWidth = measureWidth(newText);
+
+        viewport.style.width = newWidth + 'px';
+
+        const oldEl = nameEl;
+        oldEl.style.transform = `translateX(${direction * -100}%)`;
+        oldEl.style.opacity = '0';
+
+        const newEl = document.createElement('span');
+        newEl.className = 'gs-name';
+        newEl.textContent = newText;
+        newEl.style.transform = `translateX(${direction * 100}%)`;
+        newEl.style.opacity = '0';
+        viewport.appendChild(newEl);
+
+        void newEl.offsetWidth;
+        requestAnimationFrame(() => {
+          newEl.style.transform = 'translateX(0)';
+          newEl.style.opacity = '1';
+        });
+
+        setTimeout(() => {
+          oldEl.remove();
+          nameEl = newEl;
+          animating = false;
+        }, 340);
+
+        currentIndex = newIndex;
+      }
+
+      nextBtn.addEventListener('click', () => {
+        setGame((currentIndex + 1) % games.length, 1);
+      });
+
+      prevBtn.addEventListener('click', () => {
+        setGame((currentIndex - 1 + games.length) % games.length, -1);
+      });
+
+      viewport.style.width = measureWidth(games[currentIndex]) + 'px';
+    })();
   </script>
 </body>
 </html>
