@@ -546,6 +546,23 @@
       padding-bottom: 120px;
     }
 
+    .faq-static-box {
+      width: 220px; min-width: 220px; height: 380px;
+      border: 2px solid var(--border); border-radius: 4px;
+      position: relative; overflow: hidden; background: #000;
+      flex-shrink: 0; align-self: center;
+      transition: var(--transition-theme);
+    }
+    .faq-static-canvas {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      z-index: 2; pointer-events: none;
+    }
+    .faq-gif-layer {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; opacity: 0; z-index: 1;
+      transition: opacity 0.5s ease;
+    }
+
     .faq-image-placeholder {
       width: 220px;
       min-width: 220px;
@@ -847,7 +864,10 @@
 
   <!-- ──────────────────────────────── PAGE 4: FAQ ─── -->
   <section id="faq">
-    <div class="faq-image-placeholder">cool image<br>right here</div>
+    <div class="faq-static-box" id="faqStaticBox">
+      <canvas class="faq-static-canvas" id="staticCanvas"></canvas>
+      <img class="faq-gif-layer" id="gifLayer" src="" alt="">
+    </div>
 
     <div class="faq-right">
       <h2>faq</h2>
@@ -1163,6 +1183,92 @@
       // While holding without dragging, keep the frame frozen on the held position
       // (video stays paused -- already handled by pointerdown calling video.pause()).
     });
+    (function() {
+      const box = document.getElementById('faqStaticBox');
+      const canvas = document.getElementById('staticCanvas');
+      const ctx = canvas.getContext('2d');
+      const gifLayer = document.getElementById('gifLayer');
+
+      // ── PUT YOUR 5 GIF URLS HERE ──
+      const GIFS = [
+        { url: 'https://raw.githubusercontent.com/happybaggy/skidware/refs/heads/main/resources/gifs/johnskull.gif', weight: 7.5  },
+        { url: 'https://raw.githubusercontent.com/happybaggy/skidware/refs/heads/main/resources/gifs/johngodmode.gif', weight: 12.5 },
+        { url: 'https://raw.githubusercontent.com/happybaggy/skidware/refs/heads/main/resources/gifs/johnbloodiedeyes.gif', weight: 20   },
+        { url: 'https://raw.githubusercontent.com/happybaggy/skidware/refs/heads/main/resources/gifs/johnblood.gif', weight: 30   },
+        { url: 'https://raw.githubusercontent.com/happybaggy/skidware/refs/heads/main/resources/gifs/john.gif', weight: 30   }
+      ];
+
+      const PLAY_DURATION = 13000;
+      const TRANSITION    = 2000;
+      let staticRaf = null;
+      let staticOpacity = 1;
+
+      function resizeCanvas() {
+        canvas.width  = box.offsetWidth;
+        canvas.height = box.offsetHeight;
+      }
+      resizeCanvas();
+
+      function drawStatic(opacity) {
+        const w = canvas.width, h = canvas.height;
+        const img = ctx.createImageData(w, h);
+        const d = img.data;
+        const now = Date.now();
+        for (let i = 0; i < d.length; i += 4) {
+          const v = Math.random() > 0.5 ? 255 : 0;
+          const row = Math.floor(i / 4 / w);
+          const sf = 0.7 + 0.3 * Math.sin(row * 0.3 + now * 0.002);
+          const val = v * sf;
+          d[i] = val; d[i+1] = val; d[i+2] = val; d[i+3] = 255 * opacity;
+        }
+        ctx.putImageData(img, 0, 0);
+      }
+
+      function loopStatic() {
+        if (staticRaf) cancelAnimationFrame(staticRaf);
+        function frame() { drawStatic(staticOpacity); staticRaf = requestAnimationFrame(frame); }
+        staticRaf = requestAnimationFrame(frame);
+      }
+
+      function fadeStaticTo(target, ms, done) {
+        const start = performance.now(), from = staticOpacity;
+        function frame(now) {
+          const t = Math.min((now - start) / ms, 1);
+          staticOpacity = from + (target - from) * t;
+          if (t < 1) { requestAnimationFrame(frame); } else { staticOpacity = target; if (done) done(); }
+        }
+        requestAnimationFrame(frame);
+      }
+
+      function pickGif() {
+        const total = GIFS.reduce((s, g) => s + g.weight, 0);
+        let r = Math.random() * total;
+        for (const g of GIFS) { r -= g.weight; if (r <= 0) return g.url; }
+        return GIFS[GIFS.length - 1].url;
+      }
+
+      function cycle() {
+        staticOpacity = 1;
+        loopStatic();
+        gifLayer.style.opacity = '0';
+        gifLayer.src = '';
+
+        setTimeout(() => {
+          gifLayer.src = pickGif() + '?cb=' + Date.now();
+          gifLayer.onload = function() {
+            fadeStaticTo(0, 500, () => { gifLayer.style.opacity = '1'; });
+            setTimeout(() => {
+              gifLayer.style.opacity = '0';
+              fadeStaticTo(1, 500, null);
+              setTimeout(cycle, TRANSITION);
+            }, PLAY_DURATION);
+          };
+        }, 400);
+      }
+
+      loopStatic();
+      setTimeout(cycle, 800);
+    })();
   </script>
 </body>
 </html>
