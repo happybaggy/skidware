@@ -16,7 +16,29 @@
       --muted: #555;
       --border: #0a0a0a;
       --card-bg: #fafafa;
+      --hover-bg: #f5f5f5;
+      --photo-bg: #e0e0e0;
+      --photo-border: #ccc;
+      --faq-img-bg: #f0f0f0;
+      --faq-divider: #e0e0e0;
+      --footer-fg: #aaa;
       --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      --transition-theme: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+    }
+
+    html[data-theme="dark"] {
+      --bg: #0c0c0c;
+      --fg: #f2f2f2;
+      --accent: #f2f2f2;
+      --muted: #999;
+      --border: #f2f2f2;
+      --card-bg: #161616;
+      --hover-bg: #1c1c1c;
+      --photo-bg: #1f1f1f;
+      --photo-border: #333;
+      --faq-img-bg: #161616;
+      --faq-divider: #262626;
+      --footer-fg: #555;
     }
 
     html { scroll-behavior: smooth; }
@@ -26,6 +48,7 @@
       background: var(--bg);
       color: var(--fg);
       overflow-x: hidden;
+      transition: var(--transition-theme);
     }
 
     /* ─── NAV ─── */
@@ -33,11 +56,18 @@
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 100;
-      background: #fff;
+      background: var(--bg);
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 18px 48px;
+      transition: var(--transition-theme);
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 22px;
     }
 
     .nav-logo {
@@ -46,6 +76,12 @@
       letter-spacing: -0.03em;
       text-decoration: none;
       color: var(--fg);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 36px;
     }
 
     .nav-links {
@@ -64,6 +100,55 @@
 
     .nav-links a:hover { opacity: 0.5; }
 
+    /* dark mode toggle: an eye that tracks the cursor and blinks on click */
+    .theme-toggle {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--fg);
+      border-radius: 4px;
+      transition: opacity 0.15s, background 0.15s;
+    }
+
+    .theme-toggle:hover { opacity: 0.55; }
+    .theme-toggle:focus-visible {
+      outline: 2px solid var(--fg);
+      outline-offset: 2px;
+    }
+
+    .theme-toggle svg { width: 23px; height: 23px; display: block; overflow: visible; }
+
+    /* the lid stays open at all times; only its scaleY sweeps shut for a blink */
+    .eye-lid {
+      stroke: currentColor;
+      fill: none;
+      transform-box: fill-box;
+      transform-origin: center;
+      transition: transform 0.12s ease-in;
+    }
+
+    .theme-toggle.blinking .eye-lid {
+      transform: scaleY(0.05);
+      transition: transform 0.09s ease-in;
+    }
+
+    /* pupil glides toward the cursor and squashes horizontally mid-blink */
+    .eye-pupil {
+      fill: currentColor;
+      transform-box: fill-box;
+      transform-origin: center;
+      transition: transform 0.09s ease-out;
+    }
+
+    .theme-toggle.blinking .eye-pupil {
+      transform: scaleX(0.18);
+      transition: transform 0.09s ease-in;
+    }
+
     /* wavy divider under nav */
     .nav-divider {
       position: fixed;
@@ -73,6 +158,8 @@
       height: 18px;
       pointer-events: none;
     }
+
+    .nav-divider svg path { stroke: var(--fg); transition: stroke 0.25s ease; }
 
     /* ─── SECTIONS ─── */
     section {
@@ -133,7 +220,7 @@
 
     /* ─── PAGE 2: SUPPORTED GAMES ─── */
     #games {
-      background: #fff;
+      background: var(--bg);
       padding-top: 110px;
     }
 
@@ -162,7 +249,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: transform 0.2s, box-shadow 0.2s, var(--transition-theme);
     }
 
     .game-card:hover {
@@ -173,8 +260,8 @@
     .game-photo {
       width: 100%;
       aspect-ratio: 16/9;
-      background: #e0e0e0;
-      border: 1.5px solid #ccc;
+      background: var(--photo-bg);
+      border: 1.5px solid var(--photo-border);
       border-radius: 2px;
       display: flex;
       align-items: center;
@@ -183,6 +270,15 @@
       color: #888;
       font-style: italic;
       overflow: hidden;
+      transition: var(--transition-theme), opacity 0.18s ease;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .game-photo:hover { opacity: 0.85; }
+    .game-photo:focus-visible {
+      outline: 2px solid var(--fg);
+      outline-offset: 2px;
     }
 
     .game-photo img {
@@ -224,7 +320,7 @@
 
     /* ─── PAGE 3: SHOWCASE ─── */
     #showcase {
-      background: #fff;
+      background: var(--bg);
       flex-direction: column;
       gap: 0;
     }
@@ -237,7 +333,7 @@
       margin-top: 24px;
     }
 
-      .game-selector {
+    .game-selector {
       display: flex;
       align-items: center;
       gap: 14px;
@@ -283,11 +379,13 @@
 
     .gs-name {
       position: absolute;
-      top: 0;
+      top: 50%;
       left: 0;
+      transform: translateY(-50%);
       font-size: 1.05rem;
       font-weight: 600;
       letter-spacing: -0.01em;
+      line-height: 1;
       color: var(--fg);
       white-space: nowrap;
       transition: transform 0.32s cubic-bezier(.4,0,.2,1), opacity 0.32s;
@@ -325,22 +423,41 @@
       display: none;
       flex-direction: column;
       gap: 18px;
-      animation: fadeIn 0.25s ease;
     }
 
     .showcase-panel.active { display: flex; }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .showcase-video-placeholder {
+    /* ─── VIDEO FRAME (placeholder + interactive video) ─── */
+    .showcase-video-frame {
+      position: relative;
       width: 100%;
       aspect-ratio: 16/9;
       background: #111;
       border: 2px solid var(--fg);
       border-radius: 4px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.25s ease;
+    }
+
+    .showcase-video-frame video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      pointer-events: none;
+    }
+
+    .showcase-video-frame.has-video video {
+      opacity: 1;
+    }
+
+    .video-placeholder-static {
+      position: absolute;
+      inset: 0;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -348,6 +465,51 @@
       font-size: 0.85rem;
       font-style: italic;
       letter-spacing: 0.05em;
+      opacity: 1;
+      transition: opacity 0.35s ease;
+      background: #111;
+    }
+
+    .showcase-video-frame.has-video .video-placeholder-static {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* fade overlay used purely for the tab-switch static flash */
+    .video-frame-static-flash {
+      position: absolute;
+      inset: 0;
+      background: #111;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #555;
+      font-size: 0.85rem;
+      font-style: italic;
+      letter-spacing: 0.05em;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease;
+      z-index: 3;
+    }
+
+    .video-frame-static-flash.flashing {
+      opacity: 1;
+    }
+
+    /* scrub progress line */
+    .scrub-bar {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 3px;
+      background: rgba(255,255,255,0.15);
+      z-index: 2;
+    }
+
+    .scrub-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: rgba(255,255,255,0.85);
     }
 
     .showcase-desc {
@@ -375,7 +537,7 @@
 
     /* ─── PAGE 4: FAQ ─── */
     #faq {
-      background: #fff;
+      background: var(--bg);
       align-items: flex-start;
       flex-direction: row;
       gap: 64px;
@@ -388,8 +550,8 @@
       width: 220px;
       min-width: 220px;
       height: 380px;
-      background: #f0f0f0;
-      border: 2px solid #ccc;
+      background: var(--faq-img-bg);
+      border: 2px solid var(--photo-border);
       border-radius: 4px;
       display: flex;
       align-items: center;
@@ -400,6 +562,7 @@
       text-align: center;
       align-self: center;
       flex-shrink: 0;
+      transition: var(--transition-theme);
     }
 
     .faq-right {
@@ -425,7 +588,7 @@
     }
 
     .faq-item {
-      border-bottom: 1.5px solid #e0e0e0;
+      border-bottom: 1.5px solid var(--faq-divider);
     }
 
     .faq-item:last-child { border-bottom: none; }
@@ -445,9 +608,10 @@
       text-align: left;
       gap: 12px;
       transition: background 0.15s;
+      color: var(--fg);
     }
 
-    .faq-question:hover { background: #f5f5f5; }
+    .faq-question:hover { background: var(--hover-bg); }
 
     .faq-arrow {
       font-size: 0.7rem;
@@ -480,7 +644,7 @@
       left: 0; right: 0;
       text-align: center;
       font-size: 0.78rem;
-      color: #aaa;
+      color: var(--footer-fg);
       line-height: 1.8;
     }
 
@@ -490,9 +654,18 @@
       display: block;
     }
 
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        transition-duration: 0.001ms !important;
+      }
+    }
+
     /* ─── RESPONSIVE ─── */
     @media (max-width: 820px) {
       nav { padding: 16px 20px; }
+      .nav-left { gap: 14px; }
+      .nav-right { gap: 16px; }
       .nav-links { gap: 18px; }
       section { padding: 90px 20px 60px; }
       .games-grid { grid-template-columns: 1fr; max-width: 380px; }
@@ -507,19 +680,33 @@
 
   <!-- NAV -->
   <nav>
-    <a href="#home" class="nav-logo">skidware</a>
-    <ul class="nav-links">
-      <li><a href="#home">home</a></li>
-      <li><a href="#games">supported games</a></li>
-      <li><a href="#showcase">showcase</a></li>
-      <li><a href="#faq">faq</a></li>
-    </ul>
+    <div class="nav-left">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" aria-pressed="false">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <!-- outer lid: always open, only its scaleY sweeps shut on click (blink) -->
+          <path class="eye-lid" id="eyeLid"
+            d="M2.5 12 C 6 5.5, 18 5.5, 21.5 12 C 18 18.5, 6 18.5, 2.5 12 Z"
+            stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- pupil: translated toward the cursor by JS, squashed during the blink -->
+          <circle class="eye-pupil" id="eyePupil" cx="12" cy="12" r="3.1"/>
+        </svg>
+      </button>
+      <a href="#home" class="nav-logo">skidware</a>
+    </div>
+    <div class="nav-right">
+      <ul class="nav-links">
+        <li><a href="#home">home</a></li>
+        <li><a href="#games">supported games</a></li>
+        <li><a href="#showcase">showcase</a></li>
+        <li><a href="#faq">faq</a></li>
+      </ul>
+    </div>
   </nav>
 
   <!-- WAVY NAV DIVIDER -->
   <div class="nav-divider">
     <svg class="wave-svg" viewBox="0 0 1440 18" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-      <path d="M0,9 C120,3 240,15 360,9 C480,3 600,16 720,9 C840,2 960,15 1080,9 C1200,3 1320,15 1440,9" stroke="#0a0a0a" stroke-width="2.5" fill="none"/>
+      <path d="M0,9 C120,3 240,15 360,9 C480,3 600,16 720,9 C840,2 960,15 1080,9 C1200,3 1320,15 1440,9" stroke-width="2.5" fill="none"/>
     </svg>
   </div>
 
@@ -529,7 +716,7 @@
     <p>blah blah blah, flavor text, use our shit or not, i dont really care.</p>
     <div style="display: flex; gap: 28px; align-items: center;">
       <button class="btn-key" onclick="navigator.clipboard.writeText(document.getElementById('script-snippet').textContent); alert('script copied to clipboard')">copy script</button>
-      <button class="btn-key" onclick="window.location.href='https://jnkie.com/flow/19c012d6-5259-4939-baec-90c378c5e01f'">obtain key</button>
+      <button class="btn-key" onclick="window.open('https://jnkie.com/flow/19c012d6-5259-4939-baec-90c378c5e01f', '_blank', 'noopener')">obtain key</button>
     </div>
     <span id="script-snippet" style="display:none;">loadstring(game:HttpGet("PASTE_YOUR_LOADER_URL_HERE"))()</span>
   </section>
@@ -540,9 +727,9 @@
     <div class="games-grid">
 
       <div class="game-card">
-        <div class="game-photo">
+        <a class="game-photo" href="https://www.roblox.com/games/criminality" target="_blank" rel="noopener" aria-label="Open criminality game page in a new tab">
           <img src="https://tr.rbxcdn.com/180DAY-f86e027423e62e8cd18d9cec4370efac/768/432/Image/Webp/noFilter" alt="crim" onerror="this.parentElement.textContent='criminality photo'">
-        </div>
+        </a>
         <h3>criminality</h3>
         <ul class="game-features">
           <li>perfect prediction</li>
@@ -554,9 +741,9 @@
       </div>
 
       <div class="game-card">
-        <div class="game-photo">
+        <a class="game-photo" href="https://www.roblox.com/games/lone-survival" target="_blank" rel="noopener" aria-label="Open lone survival game page in a new tab">
           <img src="https://tr.rbxcdn.com/180DAY-a2879103ccc9a6b1fe7f104641c8dcab/768/432/Image/Webp/noFilter" alt="lone survival" onerror="this.parentElement.textContent='lone survival photo'">
-        </div>
+        </a>
         <h3>lone survival</h3>
         <ul class="game-features">
           <li>wip</li>
@@ -568,9 +755,9 @@
       </div>
 
       <div class="game-card">
-        <div class="game-photo">
+        <a class="game-photo" href="https://www.roblox.com/games/town" target="_blank" rel="noopener" aria-label="Open town game page in a new tab">
           <img src="https://tr.rbxcdn.com/180DAY-9b79f6174ab614332c25ec1d487372f5/768/432/Image/Webp/noFilter" alt="town" onerror="this.parentElement.textContent='town photo'">
-        </div>
+        </a>
         <h3>town</h3>
         <ul class="game-features">
           <li>wip</li>
@@ -587,16 +774,16 @@
   <!-- ────────────────────────────── PAGE 3: SHOWCASE ─── -->
   <section id="showcase">
     <div class="game-selector" id="gameSelector">
-  <button class="gs-arrow" id="gsPrev" aria-label="previous game">&lt;</button>
-  <div class="gs-bracket-wrap">
-    <span class="gs-brace">{</span>
-    <div class="gs-viewport" id="gsViewport">
-      <span class="gs-name" id="gsName">criminality</span>
+      <button class="gs-arrow" id="gsPrev" aria-label="previous game">&lt;</button>
+      <div class="gs-bracket-wrap">
+        <span class="gs-brace">{</span>
+        <div class="gs-viewport" id="gsViewport">
+          <span class="gs-name" id="gsName">criminality</span>
+        </div>
+        <span class="gs-brace">}</span>
+      </div>
+      <button class="gs-arrow" id="gsNext" aria-label="next game">&gt;</button>
     </div>
-    <span class="gs-brace">}</span>
-  </div>
-  <button class="gs-arrow" id="gsNext" aria-label="next game">&gt;</button>
-</div>
 
     <div class="showcase-tabs">
       <button class="showcase-tab active" data-panel="aimbot">aimbot</button>
@@ -606,7 +793,12 @@
 
     <div class="showcase-content">
       <div class="showcase-panel active" id="panel-aimbot">
-        <div class="showcase-video-placeholder">[ aimbot footage ]</div>
+        <div class="showcase-video-frame" data-video="">
+          <div class="video-placeholder-static">[ aimbot footage ]</div>
+          <video muted playsinline loop preload="metadata"></video>
+          <div class="video-frame-static-flash">[ aimbot footage ]</div>
+          <div class="scrub-bar"><div class="scrub-bar-fill"></div></div>
+        </div>
         <p class="showcase-desc">aimbot prediction, part prioritization, smooth aim, adjustable fov, and full customization per game. no detectable signatures.</p>
         <ul class="showcase-feature-list">
           <li>silent aim</li>
@@ -618,7 +810,12 @@
       </div>
 
       <div class="showcase-panel" id="panel-visuals">
-        <div class="showcase-video-placeholder">[ visuals footage ]</div>
+        <div class="showcase-video-frame" data-video="">
+          <div class="video-placeholder-static">[ visuals footage ]</div>
+          <video muted playsinline loop preload="metadata"></video>
+          <div class="video-frame-static-flash">[ visuals footage ]</div>
+          <div class="scrub-bar"><div class="scrub-bar-fill"></div></div>
+        </div>
         <p class="showcase-desc">full esp suite including player boxes, health bars, distance, name tags, item esp, and customizable chams.</p>
         <ul class="showcase-feature-list">
           <li>player esp</li>
@@ -630,7 +827,12 @@
       </div>
 
       <div class="showcase-panel" id="panel-misc">
-        <div class="showcase-video-placeholder">[ misc footage ]</div>
+        <div class="showcase-video-frame" data-video="">
+          <div class="video-placeholder-static">[ misc footage ]</div>
+          <video muted playsinline loop preload="metadata"></video>
+          <div class="video-frame-static-flash">[ misc footage ]</div>
+          <div class="scrub-bar"><div class="scrub-bar-fill"></div></div>
+        </div>
         <p class="showcase-desc">utility features: speedhack, bhop, flight, radar, and more depending on the supported game.</p>
         <ul class="showcase-feature-list">
           <li>bhop</li>
@@ -701,13 +903,96 @@
   </section>
 
   <script>
-    // ── Showcase tabs ──
+    // ── Dark mode toggle: eye stays open, blinks on click, pupil tracks the cursor ──
+    (function() {
+      const root = document.documentElement;
+      const toggle = document.getElementById('themeToggle');
+      const pupil = document.getElementById('eyePupil');
+
+      function applyTheme(theme, skipSave) {
+        if (theme === 'dark') {
+          root.setAttribute('data-theme', 'dark');
+          toggle.setAttribute('aria-pressed', 'true');
+          toggle.setAttribute('aria-label', 'Switch to light mode');
+        } else {
+          root.removeAttribute('data-theme');
+          toggle.setAttribute('aria-pressed', 'false');
+          toggle.setAttribute('aria-label', 'Switch to dark mode');
+        }
+        if (!skipSave) {
+          try { localStorage.setItem('skidware-theme', theme); } catch (e) {}
+        }
+      }
+
+      let saved = null;
+      try { saved = localStorage.getItem('skidware-theme'); } catch (e) {}
+      applyTheme(saved === 'dark' ? 'dark' : 'light', true);
+
+      toggle.addEventListener('click', () => {
+        // blink, then flip the theme right at the moment the lid is shut
+        toggle.classList.add('blinking');
+        window.setTimeout(() => {
+          const isDark = root.getAttribute('data-theme') === 'dark';
+          applyTheme(isDark ? 'light' : 'dark');
+        }, 90);
+        window.setTimeout(() => {
+          toggle.classList.remove('blinking');
+        }, 190);
+      });
+
+      // pupil glides toward the cursor within a small radius of the eye's center
+      const MAX_OFFSET = 2.1; // svg units, keeps the pupil inside the lid
+      let rafPending = false;
+      let lastEvent = null;
+
+      function updatePupil() {
+        rafPending = false;
+        if (!lastEvent) return;
+        const rect = toggle.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        const dx = lastEvent.clientX - centerX;
+        const dy = lastEvent.clientY - centerY;
+        const dist = Math.hypot(dx, dy) || 1;
+
+        // clamp the pull so the pupil never leaves the lid
+        const pull = Math.min(dist / 40, 1) * MAX_OFFSET;
+        const offsetX = (dx / dist) * pull;
+        const offsetY = (dy / dist) * pull;
+
+        pupil.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+      }
+
+      function queuePupilUpdate(e) {
+        lastEvent = e;
+        if (!rafPending) {
+          rafPending = true;
+          requestAnimationFrame(updatePupil);
+        }
+      }
+
+      window.addEventListener('pointermove', queuePupilUpdate, { passive: true });
+
+      // settle the pupil back to center if the pointer leaves the viewport
+      window.addEventListener('pointerleave', () => {
+        pupil.style.transform = 'translate(0px, 0px)';
+      });
+    })();
+
+    // ── Showcase tabs (with static fade flash on the active panel's video frame) ──
     document.querySelectorAll('.showcase-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         document.querySelectorAll('.showcase-tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.showcase-panel').forEach(p => p.classList.remove('active'));
         tab.classList.add('active');
-        document.getElementById('panel-' + tab.dataset.panel).classList.add('active');
+        const panel = document.getElementById('panel-' + tab.dataset.panel);
+        panel.classList.add('active');
+
+        const frame = panel.querySelector('.showcase-video-frame');
+        const flash = frame.querySelector('.video-frame-static-flash');
+        flash.classList.add('flashing');
+        window.setTimeout(() => flash.classList.remove('flashing'), 260);
       });
     });
 
@@ -720,6 +1005,7 @@
         if (!wasOpen) item.classList.add('open');
       });
     });
+
     // ── Game selector ──
     (function() {
       const games = ['criminality', 'lone survival', 'town'];
@@ -753,19 +1039,19 @@
         viewport.style.width = newWidth + 'px';
 
         const oldEl = nameEl;
-        oldEl.style.transform = `translateX(${direction * -100}%)`;
+        oldEl.style.transform = `translateY(-50%) translateX(${direction * -100}%)`;
         oldEl.style.opacity = '0';
 
         const newEl = document.createElement('span');
         newEl.className = 'gs-name';
         newEl.textContent = newText;
-        newEl.style.transform = `translateX(${direction * 100}%)`;
+        newEl.style.transform = `translateY(-50%) translateX(${direction * 100}%)`;
         newEl.style.opacity = '0';
         viewport.appendChild(newEl);
 
         void newEl.offsetWidth;
         requestAnimationFrame(() => {
-          newEl.style.transform = 'translateX(0)';
+          newEl.style.transform = 'translateY(-50%) translateX(0)';
           newEl.style.opacity = '1';
         });
 
@@ -788,6 +1074,95 @@
 
       viewport.style.width = measureWidth(games[currentIndex]) + 'px';
     })();
+
+    // ── Interactive showcase video frames ──
+    // Each .showcase-video-frame may have a data-video="url.mp4" attribute.
+    // If empty, it just behaves as the original italic placeholder.
+    // If set: video loops on its own. Click/drag horizontally scrubs playback
+    // position based on x-position within the frame. A plain (non-dragged) hold
+    // pauses on that frame until release.
+    document.querySelectorAll('.showcase-video-frame').forEach(frame => {
+      const src = frame.getAttribute('data-video');
+      const video = frame.querySelector('video');
+      const scrubFill = frame.querySelector('.scrub-bar-fill');
+
+      if (!src) {
+        // No video assigned: behaves exactly like the static placeholder, no interaction needed.
+        return;
+      }
+
+      video.src = src;
+      frame.classList.add('has-video');
+
+      let isPointerDown = false;
+      let didDrag = false;
+      let wasPlayingBeforeHold = true;
+      let pointerId = null;
+
+      function ratioFromEvent(e) {
+        const rect = frame.getBoundingClientRect();
+        const x = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
+        return rect.width === 0 ? 0 : x / rect.width;
+      }
+
+      function scrubTo(ratio) {
+        if (!video.duration || isNaN(video.duration)) return;
+        video.currentTime = ratio * video.duration;
+        scrubFill.style.width = (ratio * 100) + '%';
+      }
+
+      video.addEventListener('timeupdate', () => {
+        if (!video.duration || isPointerDown) return;
+        scrubFill.style.width = ((video.currentTime / video.duration) * 100) + '%';
+      });
+
+      video.addEventListener('loadedmetadata', () => {
+        video.play().catch(() => {});
+      });
+
+      frame.addEventListener('pointerdown', (e) => {
+        isPointerDown = true;
+        didDrag = false;
+        pointerId = e.pointerId;
+        wasPlayingBeforeHold = !video.paused;
+        frame.setPointerCapture(pointerId);
+        // Don't scrub or pause yet -- wait to see if this becomes a drag or a plain hold.
+        // But a click at a specific x should still feel responsive: pause immediately,
+        // real scrub position applied on first move or on release if no move occurred.
+        video.pause();
+      });
+
+      frame.addEventListener('pointermove', (e) => {
+        if (!isPointerDown) return;
+        didDrag = true;
+        scrubTo(ratioFromEvent(e));
+      });
+
+      function endHold(e) {
+        if (!isPointerDown) return;
+        isPointerDown = false;
+        if (pointerId !== null) {
+          try { frame.releasePointerCapture(pointerId); } catch (err) {}
+        }
+
+        if (didDrag) {
+          // Dragged: resume playing from the scrubbed position.
+          if (wasPlayingBeforeHold) video.play().catch(() => {});
+        } else {
+          // Plain click (no drag): jump playback to the clicked x position,
+          // then resume play from there once released.
+          scrubTo(ratioFromEvent(e));
+          if (wasPlayingBeforeHold) video.play().catch(() => {});
+        }
+        didDrag = false;
+      }
+
+      frame.addEventListener('pointerup', endHold);
+      frame.addEventListener('pointercancel', endHold);
+
+      // While holding without dragging, keep the frame frozen on the held position
+      // (video stays paused -- already handled by pointerdown calling video.pause()).
+    });
   </script>
 </body>
 </html>
