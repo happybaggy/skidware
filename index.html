@@ -23,8 +23,6 @@
       --footer-fg: #aaa;
       --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
       --transition-theme: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
-      --gif-invert: 1;
-      --static-bg: #111;
     }
 
     html[data-theme="dark"] {
@@ -40,8 +38,6 @@
       --faq-img-bg: #161616;
       --faq-divider: #262626;
       --footer-fg: #555;
-      --gif-invert: 0;
-      --static-bg: #111;
     }
 
     html { scroll-behavior: smooth; }
@@ -54,6 +50,7 @@
       transition: var(--transition-theme);
     }
 
+    /* NAV */
     nav {
       position: fixed;
       top: 0; left: 0; right: 0;
@@ -159,6 +156,7 @@
 
     .nav-divider svg path { stroke: var(--fg); transition: stroke 0.25s ease; }
 
+    /* SECTIONS */
     section {
       min-height: 100vh;
       display: flex;
@@ -168,6 +166,7 @@
       padding: 100px 48px 80px;
     }
 
+    /* PAGE 1: HOME */
     #home { text-align: center; }
 
     #home h1 {
@@ -204,6 +203,7 @@
     .btn-key::after  { content: ']'; margin-left: 2px; }
     .btn-key:hover { opacity: 0.45; }
 
+    /* PAGE 2: SUPPORTED GAMES */
     #games {
       background: var(--bg);
       padding-top: 110px;
@@ -295,6 +295,7 @@
     .game-showcase-btn::after  { content: ']'; margin-left: 1px; }
     .game-showcase-btn:hover { opacity: 0.4; }
 
+    /* PAGE 3: SHOWCASE */
     #showcase {
       background: var(--bg);
       flex-direction: column;
@@ -404,7 +405,7 @@
 
     .showcase-panel.active { display: flex; }
 
-    /* ─── VIDEO FRAME ─── */
+    /* VIDEO FRAME */
     .showcase-video-frame {
       position: relative;
       width: 100%;
@@ -506,7 +507,7 @@
       letter-spacing: 0.02em;
     }
 
-    /* ─── PAGE 4: FAQ ─── */
+    /* PAGE 4: FAQ */
     #faq {
       background: var(--bg);
       align-items: flex-start;
@@ -515,9 +516,11 @@
       justify-content: center;
       position: relative;
       padding-bottom: 120px;
+      /* push content down so gif box and faq accordion align lower */
+      padding-top: 160px;
     }
 
-    /* gif static box — same dark background as video frames */
+    /* gif box */
     .faq-static-box {
       width: 220px;
       min-width: 220px;
@@ -526,14 +529,15 @@
       border-radius: 4px;
       position: relative;
       overflow: hidden;
-      background: #111;
+      background: var(--bg);
       flex-shrink: 0;
       align-self: flex-start;
-      margin-top: 52px; /* visually aligns with the top of the faq label + box */
-      transition: border-color 0.25s ease;
+      margin-top: 60px;
+      cursor: pointer;
+      transition: var(--transition-theme);
     }
 
-    /* canvas sits on top, same z approach as video-frame-static-flash */
+    /* canvas for TV static — sits on top of gif */
     .faq-static-canvas {
       position: absolute;
       inset: 0;
@@ -543,7 +547,7 @@
       pointer-events: none;
     }
 
-    /* gif layer below canvas, inverted in light mode */
+    /* gif image layer — below static canvas */
     .faq-gif-layer {
       position: absolute;
       inset: 0;
@@ -553,11 +557,15 @@
       opacity: 0;
       z-index: 1;
       transition: opacity 0.5s ease;
-      /* match page bg color so transparent gif areas blend */
-      background: var(--bg);
-      /* invert in light mode, leave as-is in dark */
-      filter: invert(var(--gif-invert));
-      transition: opacity 0.5s ease, filter 0.25s ease;
+      /* invert applied via JS class for light mode */
+    }
+
+    html:not([data-theme="dark"]) .faq-gif-layer {
+      filter: invert(1);
+    }
+
+    html[data-theme="dark"] .faq-gif-layer {
+      filter: none;
     }
 
     .faq-right {
@@ -566,6 +574,8 @@
       display: flex;
       flex-direction: column;
       gap: 0;
+      /* push accordion down to visually align with gif box */
+      margin-top: 60px;
     }
 
     .faq-right h2 {
@@ -582,10 +592,7 @@
       overflow: hidden;
     }
 
-    .faq-item {
-      border-bottom: 1.5px solid var(--faq-divider);
-    }
-
+    .faq-item { border-bottom: 1.5px solid var(--faq-divider); }
     .faq-item:last-child { border-bottom: none; }
 
     .faq-question {
@@ -632,6 +639,7 @@
       padding: 0 20px 18px;
     }
 
+    /* FOOTER */
     footer {
       position: absolute;
       bottom: 28px;
@@ -659,14 +667,15 @@
       section { padding: 90px 20px 60px; }
       .games-grid { grid-template-columns: 1fr; max-width: 380px; }
       .showcase-tabs { gap: 36px; }
-      #faq { flex-direction: column; align-items: center; }
-      .faq-static-box { width: 160px; min-width: 160px; height: 240px; margin-top: 0; align-self: center; }
-      .faq-right { max-width: 100%; }
+      #faq { flex-direction: column; align-items: center; padding-top: 120px; }
+      .faq-static-box { width: 160px; min-width: 160px; height: 240px; margin-top: 0; }
+      .faq-right { max-width: 100%; margin-top: 0; }
     }
   </style>
 </head>
 <body>
 
+  <!-- NAV -->
   <nav>
     <div class="nav-left">
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" aria-pressed="false">
@@ -689,12 +698,14 @@
     </div>
   </nav>
 
+  <!-- WAVY NAV DIVIDER -->
   <div class="nav-divider">
     <svg class="wave-svg" viewBox="0 0 1440 18" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
       <path d="M0,9 C120,3 240,15 360,9 C480,3 600,16 720,9 C840,2 960,15 1080,9 C1200,3 1320,15 1440,9" stroke-width="2.5" fill="none"/>
     </svg>
   </div>
 
+  <!-- PAGE 1: HOME -->
   <section id="home">
     <h1>skidware</h1>
     <p>blah blah blah, flavor text, use our shit or not, i dont really care.</p>
@@ -705,6 +716,7 @@
     <span id="script-snippet" style="display:none;">loadstring(game:HttpGet("PASTE_YOUR_LOADER_URL_HERE"))()</span>
   </section>
 
+  <!-- PAGE 2: GAMES -->
   <section id="games">
     <h2>nil supported games</h2>
     <div class="games-grid">
@@ -748,6 +760,7 @@
     </div>
   </section>
 
+  <!-- PAGE 3: SHOWCASE -->
   <section id="showcase">
     <div class="game-selector" id="gameSelector">
       <button class="gs-arrow" id="gsPrev" aria-label="previous game">&lt;</button>
@@ -809,8 +822,9 @@
     </div>
   </section>
 
+  <!-- PAGE 4: FAQ -->
   <section id="faq">
-    <!-- gif static box: aligns to top of faq-right via align-self + margin-top -->
+
     <div class="faq-static-box" id="faqStaticBox">
       <canvas class="faq-static-canvas" id="staticCanvas"></canvas>
       <img class="faq-gif-layer" id="gifLayer" src="" alt="">
@@ -857,7 +871,7 @@
             how do i join the community of skids?
             <span class="faq-arrow">▶</span>
           </button>
-          <div class="faq-answer">we, (and me) can be found in the <a href="https://discord.gg/4m2kUKJ7aE" target="_blank" style="color: var(--fg); font-weight: 600; text-decoration: underline;">skidware server</a>, here i post updates and the script status.</div>
+          <div class="faq-answer">we, (and me) can be found in the <a href="https://discord.gg/4m2kUKJ7aE" target="_blank" style="color: var(--fg); font-weight: 600; text-decoration: underline;">skidware server</a>, here i post updates and the script status</div>
         </div>
 
       </div>
@@ -901,7 +915,9 @@
           const isDark = root.getAttribute('data-theme') === 'dark';
           applyTheme(isDark ? 'light' : 'dark');
         }, 90);
-        window.setTimeout(() => { toggle.classList.remove('blinking'); }, 190);
+        window.setTimeout(() => {
+          toggle.classList.remove('blinking');
+        }, 190);
       });
 
       const MAX_OFFSET = 2.1;
@@ -918,7 +934,7 @@
         const dy = lastEvent.clientY - centerY;
         const dist = Math.hypot(dx, dy) || 1;
         const pull = Math.min(dist / 40, 1) * MAX_OFFSET;
-        pupil.style.transform = `translate(${(dx/dist)*pull}px, ${(dy/dist)*pull}px)`;
+        pupil.style.transform = `translate(${(dx / dist) * pull}px, ${(dy / dist) * pull}px)`;
       }
 
       function queuePupilUpdate(e) {
@@ -963,12 +979,16 @@
       let nameEl = document.getElementById('gsName');
       const prevBtn = document.getElementById('gsPrev');
       const nextBtn = document.getElementById('gsNext');
+
       const measurer = document.createElement('span');
       measurer.className = 'gs-name';
       measurer.style.cssText = 'position:absolute;visibility:hidden;left:-9999px';
       document.body.appendChild(measurer);
 
-      function measureWidth(text) { measurer.textContent = text; return measurer.getBoundingClientRect().width; }
+      function measureWidth(text) {
+        measurer.textContent = text;
+        return measurer.getBoundingClientRect().width;
+      }
 
       function setGame(newIndex, direction) {
         if (animating) return;
@@ -985,7 +1005,10 @@
         newEl.style.opacity = '0';
         viewport.appendChild(newEl);
         void newEl.offsetWidth;
-        requestAnimationFrame(() => { newEl.style.transform = 'translateY(-50%) translateX(0)'; newEl.style.opacity = '1'; });
+        requestAnimationFrame(() => {
+          newEl.style.transform = 'translateY(-50%) translateX(0)';
+          newEl.style.opacity = '1';
+        });
         setTimeout(() => { oldEl.remove(); nameEl = newEl; animating = false; }, 340);
         currentIndex = newIndex;
       }
@@ -995,7 +1018,7 @@
       viewport.style.width = measureWidth(games[currentIndex]) + 'px';
     })();
 
-    // ── Interactive showcase video frames ──
+    // ── Showcase video frames ──
     document.querySelectorAll('.showcase-video-frame').forEach(frame => {
       const src = frame.getAttribute('data-video');
       const video = frame.querySelector('video');
@@ -1009,6 +1032,7 @@
         const rect = frame.getBoundingClientRect();
         return rect.width === 0 ? 0 : Math.min(Math.max(e.clientX - rect.left, 0), rect.width) / rect.width;
       }
+
       function scrubTo(ratio) {
         if (!video.duration || isNaN(video.duration)) return;
         video.currentTime = ratio * video.duration;
@@ -1019,45 +1043,57 @@
         if (!video.duration || isPointerDown) return;
         scrubFill.style.width = ((video.currentTime / video.duration) * 100) + '%';
       });
+
       video.addEventListener('loadedmetadata', () => { video.play().catch(() => {}); });
+
       frame.addEventListener('pointerdown', (e) => {
         isPointerDown = true; didDrag = false; pointerId = e.pointerId;
         wasPlayingBeforeHold = !video.paused;
         frame.setPointerCapture(pointerId);
         video.pause();
       });
-      frame.addEventListener('pointermove', (e) => { if (!isPointerDown) return; didDrag = true; scrubTo(ratioFromEvent(e)); });
+
+      frame.addEventListener('pointermove', (e) => {
+        if (!isPointerDown) return;
+        didDrag = true;
+        scrubTo(ratioFromEvent(e));
+      });
+
       function endHold(e) {
         if (!isPointerDown) return;
         isPointerDown = false;
-        try { frame.releasePointerCapture(pointerId); } catch (err) {}
+        if (pointerId !== null) { try { frame.releasePointerCapture(pointerId); } catch (err) {} }
         scrubTo(ratioFromEvent(e));
         if (wasPlayingBeforeHold) video.play().catch(() => {});
         didDrag = false;
       }
+
       frame.addEventListener('pointerup', endHold);
       frame.addEventListener('pointercancel', endHold);
     });
 
-    // ── FAQ gif static box ──
+    // ── FAQ gif box with TV static ──
     (function() {
-      const box = document.getElementById('faqStaticBox');
-      const canvas = document.getElementById('staticCanvas');
-      const ctx = canvas.getContext('2d');
+      const box      = document.getElementById('faqStaticBox');
+      const canvas   = document.getElementById('staticCanvas');
+      const ctx      = canvas.getContext('2d');
       const gifLayer = document.getElementById('gifLayer');
 
       const GIFS = [
-        { url: 'https://raw.githubusercontent.com/happybaggy/skidware/refs/heads/main/resources/gifs/johnskull.gif',        weight: 7.5  },
-        { url: 'https://raw.githubusercontent.com/happybaggy/skidware/refs/heads/main/resources/gifs/johngodmode.gif',      weight: 12.5 },
-        { url: 'https://raw.githubusercontent.com/happybaggy/skidware/refs/heads/main/resources/gifs/johnbloodiedeyes.gif', weight: 20   },
-        { url: 'https://raw.githubusercontent.com/happybaggy/skidware/refs/heads/main/resources/gifs/johnblood.gif',        weight: 30   },
-        { url: 'https://raw.githubusercontent.com/happybaggy/skidware/refs/heads/main/resources/gifs/john.gif',             weight: 30   }
+        { url: 'https://raw.githubusercontent.com/happybaggy/skidware/refs/heads/main/resources/gifs/johnskull.gif',       weight: 7.5  },
+        { url: 'https://raw.githubusercontent.com/happybaggy/skidware/refs/heads/main/resources/gifs/johngodmode.gif',     weight: 12.5 },
+        { url: 'https://raw.githubusercontent.com/happybaggy/skidware/refs/heads/main/resources/gifs/johnbloodiedeyes.gif',weight: 20   },
+        { url: 'https://raw.githubusercontent.com/happybaggy/skidware/refs/heads/main/resources/gifs/johnblood.gif',       weight: 30   },
+        { url: 'https://raw.githubusercontent.com/happybaggy/skidware/refs/heads/main/resources/gifs/john.gif',            weight: 30   }
       ];
 
-      const PLAY_DURATION = 13000;
-      const TRANSITION    = 2000;
-      let staticRaf = null;
+      const PLAY_DURATION = 13000; // ms gif plays before fading out
+      const TRANSITION    = 2000;  // ms of static between gifs
+      let staticRaf    = null;
       let staticOpacity = 1;
+      let lastGifIndex  = -1;      // tracks last picked to prevent repeat
+      let cycleTimer    = null;    // holds setTimeout handle for early reroll
+      let cyclePhase    = 'static'; // 'static' | 'gif'
 
       function resizeCanvas() {
         canvas.width  = box.offsetWidth;
@@ -1066,21 +1102,27 @@
       resizeCanvas();
       window.addEventListener('resize', resizeCanvas);
 
-      // same noise algorithm as the video placeholder static
+      // ── noise matching the video-frame placeholder style ──
+      // dark scanlines on near-black noise, exactly like #111 bg with #555 text vibe
       function drawStatic(opacity) {
         const w = canvas.width, h = canvas.height;
-        const imageData = ctx.createImageData(w, h);
-        const d = imageData.data;
+        const img = ctx.createImageData(w, h);
+        const d = img.data;
         const now = Date.now();
         for (let i = 0; i < d.length; i += 4) {
-          const v = Math.random() > 0.5 ? 255 : 0;
-          const row = Math.floor(i / 4 / w);
-          const sf = 0.7 + 0.3 * Math.sin(row * 0.3 + now * 0.002);
-          const val = v * sf;
-          d[i] = val; d[i+1] = val; d[i+2] = val;
-          d[i+3] = 255 * opacity;
+          // base noise: mostly dark with occasional bright flicker
+          const bright = Math.random();
+          let v;
+          if (bright > 0.85)       v = Math.floor(Math.random() * 80 + 140); // bright speckle
+          else if (bright > 0.55)  v = Math.floor(Math.random() * 40 + 20);  // mid dark
+          else                     v = Math.floor(Math.random() * 18);         // near black
+          // horizontal scanline bands (subtle brightness roll)
+          const row  = Math.floor(i / 4 / w);
+          const band = 0.78 + 0.22 * Math.sin(row * 0.28 + now * 0.0018);
+          const val  = Math.min(255, v * band);
+          d[i] = val; d[i+1] = val; d[i+2] = val; d[i+3] = Math.round(255 * opacity);
         }
-        ctx.putImageData(imageData, 0, 0);
+        ctx.putImageData(img, 0, 0);
       }
 
       function loopStatic() {
@@ -1091,46 +1133,81 @@
 
       function fadeStaticTo(target, ms, done) {
         const start = performance.now(), from = staticOpacity;
-        function frame(now) {
+        function step(now) {
           const t = Math.min((now - start) / ms, 1);
           staticOpacity = from + (target - from) * t;
-          if (t < 1) { requestAnimationFrame(frame); } else { staticOpacity = target; if (done) done(); }
+          if (t < 1) { requestAnimationFrame(step); } else { staticOpacity = target; if (done) done(); }
         }
-        requestAnimationFrame(frame);
+        requestAnimationFrame(step);
       }
 
+      // pick a gif that isn't the last one shown
       function pickGif() {
-        const total = GIFS.reduce((s, g) => s + g.weight, 0);
+        const pool = GIFS.map((g, i) => ({ ...g, i })).filter(g => g.i !== lastGifIndex);
+        const total = pool.reduce((s, g) => s + g.weight, 0);
         let r = Math.random() * total;
-        for (const g of GIFS) { r -= g.weight; if (r <= 0) return g.url; }
-        return GIFS[GIFS.length - 1].url;
+        for (const g of pool) {
+          r -= g.weight;
+          if (r <= 0) { lastGifIndex = g.i; return g.url; }
+        }
+        lastGifIndex = pool[pool.length - 1].i;
+        return pool[pool.length - 1].url;
       }
 
-      function cycle() {
+      function startCycle() {
+        // clear any pending timer from an early reroll click
+        if (cycleTimer) { clearTimeout(cycleTimer); cycleTimer = null; }
+
+        cyclePhase = 'static';
         staticOpacity = 1;
         loopStatic();
         gifLayer.style.opacity = '0';
         gifLayer.src = '';
 
-        setTimeout(() => {
-          gifLayer.src = pickGif() + '?cb=' + Date.now();
+        cycleTimer = setTimeout(() => {
+          const url = pickGif();
+          gifLayer.src = url + '?cb=' + Date.now();
+
           gifLayer.onload = function() {
+            cyclePhase = 'gif';
             // fade static out, reveal gif
-            fadeStaticTo(0, 500, () => { gifLayer.style.opacity = '1'; });
-            // after play duration, fade static back in over the gif, then cycle
-            setTimeout(() => {
-              gifLayer.style.opacity = '0';
-              fadeStaticTo(1, 500, null);
-              setTimeout(cycle, TRANSITION);
-            }, PLAY_DURATION);
+            fadeStaticTo(0, 500, () => {
+              gifLayer.style.opacity = '1';
+              // after PLAY_DURATION, fade gif back to static
+              cycleTimer = setTimeout(() => {
+                gifLayer.style.opacity = '0';
+                fadeStaticTo(1, 500, null);
+                cycleTimer = setTimeout(startCycle, TRANSITION - 500);
+              }, PLAY_DURATION);
+            });
           };
-          // if gif fails to load, still cycle
-          gifLayer.onerror = function() { setTimeout(cycle, 1000); };
+
+          gifLayer.onerror = function() {
+            // gif failed to load — just wait and try again
+            cycleTimer = setTimeout(startCycle, TRANSITION);
+          };
         }, 400);
       }
 
+      // ── click to early reroll ──
+      box.addEventListener('click', () => {
+        // cancel whatever is pending
+        if (cycleTimer) { clearTimeout(cycleTimer); cycleTimer = null; }
+        if (staticRaf)  { cancelAnimationFrame(staticRaf); staticRaf = null; }
+
+        // snap everything back to static immediately, then begin a fresh cycle
+        gifLayer.style.opacity = '0';
+        gifLayer.src = '';
+        staticOpacity = 1;
+        loopStatic();
+
+        // short pause so the static flash feels intentional
+        cycleTimer = setTimeout(startCycle, 300);
+      });
+
+      // boot
       loopStatic();
-      setTimeout(cycle, 800);
+      setTimeout(startCycle, 800);
     })();
   </script>
 </body>
